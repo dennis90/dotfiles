@@ -1,4 +1,3 @@
--- Plugin manager
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
 	vim.fn.system({
@@ -136,9 +135,10 @@ local null_ls = require("null-ls")
 local null_opts = lsp.build_options("null-ls", {})
 
 local function format_imports()
-	vim.cmd("write")
+	vim.cmd("write", { silent = true })
 	vim.fn.system("format-imports " .. vim.fn.expand("%"))
-	vim.cmd("e!")
+	vim.cmd("e!", { silent = true })
+	vim.notify("Formatted imports")
 end
 
 -- Import sorter
@@ -252,6 +252,7 @@ require("neodev").setup()
 
 -- Copilot settings
 vim.g.copilot_no_tab_map = true
+
 vim.api.nvim_set_keymap("i", "<C-j>", 'copilot#Accept("<CR>")', { silent = true, expr = true })
 
 -- Fuck my life
@@ -267,3 +268,11 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 
 -- Lua snippets
 require("luasnip.loaders.from_vscode").lazy_load({ paths = "~/.config/nvim/snippets" })
+
+-- Copy file path
+local function copy_file_path()
+	local path = vim.fn.expand("%")
+	vim.fn.setreg("+", path)
+	vim.notify("Copied " .. path .. " to clipboard")
+end
+vim.keymap.set("n", "<leader>cf", copy_file_path, { noremap = true, silent = true })
